@@ -18,11 +18,11 @@ from datetime import datetime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
-from data_preprocessing import DataPreprocessor
-from collaborative_filtering import CollaborativeFiltering
-from content_based_filtering import ContentBasedFiltering
-from hybrid_model import HybridRecommendationSystem
-from evaluation import RecommendationEvaluator
+from src.data_preprocessing import DataPreprocessor
+from src.collaborative_filtering import CollaborativeFiltering
+from src.content_based_filtering import ContentBasedFiltering
+from src.hybrid_model import HybridRecommendationSystem
+from src.evaluation import RecommendationEvaluator
 
 # Page configuration
 st.set_page_config(

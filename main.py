@@ -8,7 +8,6 @@ import os
 import subprocess
 import webbrowser
 import time
-import threading
 
 # Add src to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
@@ -22,10 +21,10 @@ def launch_streamlit():
     print("🔗 If it doesn't open automatically, go to: http://localhost:8501")
     print("-" * 60)
     
-    # Launch Streamlit
+    # Launch Streamlit (now points to web_interface.py in root)
     streamlit_cmd = [
         sys.executable, "-m", "streamlit", "run", 
-        "src/web_interface.py",
+        "web_interface.py",
         "--server.port=8501",
         "--server.headless=true",
         "--browser.gatherUsageStats=false"
@@ -141,7 +140,7 @@ Examples:
                 # Launch without opening browser
                 streamlit_cmd = [
                     sys.executable, "-m", "streamlit", "run", 
-                    "src/web_interface.py",
+                    "web_interface.py",
                     "--server.port=8501"
                 ]
                 process = subprocess.Popen(streamlit_cmd)
