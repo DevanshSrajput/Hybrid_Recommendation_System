@@ -111,23 +111,30 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
 - Home  
   ![Home Screenshot](assests/Home.png)
 
+---
+  
 - Dashboard  
   ![Dashboard Screenshot](assests/Dashboard.png)
+---
 
 - Recommendation  
   ![Recommendation Screenshot](assests/Recommendation%20Page.png)  
   ![Recommendation Provided Screenshot](assests/Recommendation%20Provided.png)
+---
 
 - Analytics  
   ![Analytics Screenshot](assests/Analytics.png)  
   ![Analytic-2 Screenshot](assests/Analytics-2.png)
+---
 
 - Explore Data  
   ![Explore Data Screenshot](assests/Explore%20Data.png)<br>
   ![Explore Data-2 Screenshot](assests/Explore%20Data-2.png)
+---
 
 - About  
   ![About Screenshot](assests/About.png)
+---
 
 - ## WalkThrough Video:
   
