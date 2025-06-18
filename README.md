@@ -108,8 +108,6 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
 
 > _"A picture is worth a thousand words, but a screenshot is worth at least a bug report."_
 
-**[Insert your glorious screenshots here]**
-
 - Home  
   ![Home Screenshot](assests/Home.png)
 
@@ -117,7 +115,7 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
   ![Dashboard Screenshot](assests/Dashboard.png)
 
 - Recommendation  
-  ![Recommendation Screenshot](assests/Recommendation.png)  
+  ![Recommendation Screenshot](assests/Recommendation%20Page.png)  
   ![Recommendation Provided Screenshot](assests/Recommendation%20Provided.png)
 
 - Analytics  
