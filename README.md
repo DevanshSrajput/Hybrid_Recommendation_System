@@ -115,11 +115,7 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
   ![Dashboard Screenshot](assests/Dashboard.png)
 
 - Recommendation  
-<<<<<<< HEAD
   ![Recommendation Screenshot](assests/Recommendation%20Page.png)  
-=======
-  ![Recommendation Screenshot](assests/Recommendatio%20Page.png)  
->>>>>>> e3946b36c659896db66858e70c6e2c6a7122c813
   ![Recommendation Provided Screenshot](assests/Recommendation%20Provided.png)
 
 - Analytics  
