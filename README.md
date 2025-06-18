@@ -131,7 +131,7 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
 - About  
   ![About Screenshot](assests/About.png)
 
-- [Demo Video Link](assests/Movie_Recommendation_System.mp4)
+- [![Walkthrough Video](assests/Home.png)](assests/Movie_Recommendation_System.mp4)
 
 ---
 
