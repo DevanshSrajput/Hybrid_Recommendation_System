@@ -110,16 +110,28 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
 
 **[Insert your glorious screenshots here]**
 
-- Dashboard  
-  ![Dashboard Screenshot](screenshots/dashboard.png)
+- Home  
+  ![Home Screenshot](assests/Home.png)
 
-- Recommendations  
-  ![Recommendations Screenshot](screenshots/recommendations.png)
+- Dashboard  
+  ![Dashboard Screenshot](assests/Dashboard.png)
+
+- Recommendation  
+  ![Recommendation Screenshot](assests/Recommendation.png)  
+  ![Recommendation Provided Screenshot](assests/Recommendation%20Provided.png)
 
 - Analytics  
-  ![Analytics Screenshot](screenshots/analytics.png)
+  ![Analytics Screenshot](assests/Analytics.png)  
+  ![Analytic-2 Screenshot](assests/Analytics-2.png)
 
-- [Demo Video Link](#) (Coming soon, or never.)
+- Explore Data  
+  ![Explore Data Screenshot](assests/Explore%20Data.png)<br>
+  ![Explore Data-2 Screenshot](assests/Explore%20Data-2.png)
+
+- About  
+  ![About Screenshot](assests/About.png)
+
+- [Demo Video Link](assests/Movie_Recommendation_System.mp4)
 
 ---
 
