@@ -117,7 +117,7 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
   ![Dashboard Screenshot](assests/Dashboard.png)
 
 - Recommendation  
-  ![Recommendation Screenshot](assests/Recommendation.png)  
+  ![Recommendation Screenshot](assests/Recommendatio%20Page.png)  
   ![Recommendation Provided Screenshot](assests/Recommendation%20Provided.png)
 
 - Analytics  
@@ -131,7 +131,12 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
 - About  
   ![About Screenshot](assests/About.png)
 
-- [![Walkthrough Video](assests/Home.png)](assests/Movie_Recommendation_System.mp4)
+- ## WalkThrough Video:
+  
+
+https://github.com/user-attachments/assets/16b1d57c-2ec8-4b80-b37d-045daa910e9b
+
+
 
 ---
 
