@@ -108,33 +108,26 @@ Built with Python, Streamlit, and a healthy dose of sarcasm.
 
 > _"A picture is worth a thousand words, but a screenshot is worth at least a bug report."_
 
-- Home  
-  ![Home Screenshot](assests/Home.png)
-
----
-  
-- Dashboard  
-  ![Dashboard Screenshot](assests/Dashboard.png)
----
-
-- Recommendation  
-  ![Recommendation Screenshot](assests/Recommendation%20Page.png)  
-  ![Recommendation Provided Screenshot](assests/Recommendation%20Provided.png)
----
-
-- Analytics  
-  ![Analytics Screenshot](assests/Analytics.png)  
-  ![Analytic-2 Screenshot](assests/Analytics-2.png)
----
-
-- Explore Data  
-  ![Explore Data Screenshot](assests/Explore%20Data.png)<br>
-  ![Explore Data-2 Screenshot](assests/Explore%20Data-2.png)
----
-
-- About  
-  ![About Screenshot](assests/About.png)
----
+<div align="center">
+<table>
+<tr>
+<td align="cemter"><img src="assests/Home.png" width="400"><br><b>🏡Home Dashboard</b></td>
+<td align="cemter"><img src="assests/Recommendation Page.png" width="400"><br><b>📤 Recommendation Page</b></td>
+</tr>
+<tr>
+<td align="cemter"><img src="assests/Recommendation Provided.png" width="400"><br><b>📊 Recommendation Preview</b></td>
+<td align="cemter"><img src="assests/Analytics.png" width="400"><br><b>💬 Analytics</b></td>
+</tr>
+<tr>
+<td align="cemter"><img src="assests/Analytics-2.png" width="400"><br><b>🤖 Analytics Preview</b></td>
+<td align="cemter"><img src="assests/Explore Data.png" width="400"><br><b>📊 Explore Data</b></td>
+</tr>
+<tr>
+<td align="cemter"><img src="assests/Explore Data-2.png" width="400"><br><b>⚙️ Data Preview</b></td>
+<td align="cemter"><img src="assests/About.png" width="400"><br><b>About</b></td>
+</tr>
+</table>
+</div>
 
 - ## WalkThrough Video:
   
