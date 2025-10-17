@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Any
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from src.utils import setup_logging, download_file, extract_zip, create_directories  # Changed from relative to absolute
@@ -11,21 +11,37 @@ logger = setup_logging()
 
 class DataPreprocessor:
     """Handles data preprocessing for the recommendation system."""
-    
-    def __init__(self, data_path: str = "data/"):
+
+    DEFAULT_THRESHOLD_MAP: Dict[str, Tuple[int, int]] = {
+        "100k": (10, 10),
+        "1m": (18, 22),
+        "10m": (25, 30)
+    }
+
+    def __init__(
+        self,
+        data_path: str = "data/",
+        min_user_interactions: int = 8,
+        min_item_interactions: int = 8,
+        iterative_pruning: bool = True,
+    ):
         self.data_path = data_path
         self.raw_data_path = os.path.join(data_path, "raw")
         self.processed_data_path = os.path.join(data_path, "processed")
-        
+
         # Create directories
         create_directories([self.raw_data_path, self.processed_data_path])
-        
+
         # Initialize encoders
         self.user_encoder = LabelEncoder()
         self.item_encoder = LabelEncoder()
+        self.base_min_user_interactions = max(1, min_user_interactions)
+        self.base_min_item_interactions = max(1, min_item_interactions)
+        self.iterative_pruning = iterative_pruning
         
     def download_movielens_data(self, size: str = "100k") -> None:
         """Download MovieLens dataset."""
+        size = size.lower()
         urls = {
             "100k": "https://files.grouplens.org/datasets/movielens/ml-100k.zip",
             "1m": "https://files.grouplens.org/datasets/movielens/ml-1m.zip",
@@ -42,7 +58,12 @@ class DataPreprocessor:
             download_file(urls[size], zip_filename)
             
         # Extract if not already extracted
-        extract_path = os.path.join(self.raw_data_path, f"ml-{size}")
+        extract_path_map = {
+            "100k": os.path.join(self.raw_data_path, "ml-100k"),
+            "1m": os.path.join(self.raw_data_path, "ml-1m"),
+            "10m": os.path.join(self.raw_data_path, "ml-10M100K"),
+        }
+        extract_path = extract_path_map.get(size, os.path.join(self.raw_data_path, f"ml-{size}"))
         if not os.path.exists(extract_path):
             logger.info("Extracting dataset...")
             extract_zip(zip_filename, self.raw_data_path)
@@ -51,6 +72,7 @@ class DataPreprocessor:
         """Load MovieLens data."""
         # Download if not exists
         self.download_movielens_data(size)
+        size = size.lower()
         
         if size == "100k":
             # Load ratings
@@ -92,36 +114,98 @@ class DataPreprocessor:
                 engine='python',
                 encoding='latin-1'
             )
-        
+        elif size == "10m":
+            ratings_path = os.path.join(self.raw_data_path, "ml-10M100K", "ratings.dat")
+            ratings = pd.read_csv(
+                ratings_path,
+                sep='::',
+                names=['user_id', 'item_id', 'rating', 'timestamp'],
+                engine='python',
+                encoding='latin-1'
+            )
+
+            movies_path = os.path.join(self.raw_data_path, "ml-10M100K", "movies.dat")
+            movies = pd.read_csv(
+                movies_path,
+                sep='::',
+                names=['item_id', 'title', 'genres'],
+                engine='python',
+                encoding='latin-1'
+            )
+        else:
+            raise ValueError(f"Unsupported dataset size: {size}")
+
         logger.info(f"Loaded {len(ratings)} ratings and {len(movies)} movies")
         return ratings, movies
     
-    def clean_ratings_data(self, ratings: pd.DataFrame) -> pd.DataFrame:
-        """Clean and validate ratings data."""
+    def clean_ratings_data(
+        self,
+        ratings: pd.DataFrame,
+        min_user_interactions: int,
+        min_item_interactions: int,
+    ) -> pd.DataFrame:
+        """Clean and validate ratings data, aggressively pruning sparse users/items."""
         # Remove duplicates
         ratings = ratings.drop_duplicates()
-        
+
         # Remove invalid ratings
         ratings = ratings[ratings['rating'].between(1, 5)]
-        
-        # Remove users/items with too few interactions
-        min_interactions = 5
-        user_counts = ratings['user_id'].value_counts()
-        item_counts = ratings['item_id'].value_counts()
-        
-        valid_users = user_counts[user_counts >= min_interactions].index
-        valid_items = item_counts[item_counts >= min_interactions].index
-        
-        ratings = ratings[
-            (ratings['user_id'].isin(valid_users)) & 
-            (ratings['item_id'].isin(valid_items))
-        ]
-        
-        logger.info(f"After cleaning: {len(ratings)} ratings, "
-                   f"{ratings['user_id'].nunique()} users, "
-                   f"{ratings['item_id'].nunique()} items")
-        
+
+        if len(ratings) == 0:
+            return ratings
+
+        min_user = max(2, min_user_interactions)
+        min_item = max(2, min_item_interactions)
+
+        previous_shape = None
+        iteration = 0
+        while previous_shape != ratings.shape:
+            previous_shape = ratings.shape
+            iteration += 1
+
+            user_counts = ratings['user_id'].value_counts()
+            valid_users = user_counts[user_counts >= min_user].index
+
+            item_counts = ratings['item_id'].value_counts()
+            valid_items = item_counts[item_counts >= min_item].index
+
+            ratings = ratings[
+                ratings['user_id'].isin(valid_users)
+                & ratings['item_id'].isin(valid_items)
+            ]
+
+            if not self.iterative_pruning:
+                break
+
+        logger.info(
+            "After cleaning (min_user=%s, min_item=%s, iterations=%s): %s ratings, %s users, %s items",
+            min_user,
+            min_item,
+            iteration,
+            len(ratings),
+            ratings['user_id'].nunique(),
+            ratings['item_id'].nunique(),
+        )
+
         return ratings
+
+    @staticmethod
+    def calculate_density(ratings: pd.DataFrame) -> float:
+        """Compute interaction density for the given ratings table."""
+        n_users = ratings['user_id'].nunique()
+        n_items = ratings['item_id'].nunique()
+        total_cells = n_users * n_items
+        if total_cells == 0:
+            return 0.0
+        return len(ratings) / total_cells
+
+    def determine_thresholds(self, dataset_size: str) -> Tuple[int, int]:
+        """Determine pruning thresholds for a given dataset size."""
+        dataset_size = dataset_size.lower()
+        return self.DEFAULT_THRESHOLD_MAP.get(
+            dataset_size,
+            (self.base_min_user_interactions, self.base_min_item_interactions),
+        )
     
     def encode_ids(self, ratings: pd.DataFrame) -> pd.DataFrame:
         """Encode user and item IDs to consecutive integers."""
@@ -167,12 +251,13 @@ class DataPreprocessor:
                    test_size: float = 0.2, 
                    random_state: int = 42) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Split data into train and test sets."""
-        return train_test_split(
+        train_ratings, test_ratings = train_test_split(
             ratings, 
             test_size=test_size, 
             random_state=random_state,
             stratify=ratings['user_id']
         )
+        return train_ratings, test_ratings
     
     def save_processed_data(self, data_dict: Dict[str, pd.DataFrame]) -> None:
         """Save processed data to files."""
@@ -189,11 +274,22 @@ class DataPreprocessor:
         else:
             raise FileNotFoundError(f"Processed data file not found: {filepath}")
     
-    def preprocess_all(self, dataset_size: str = "100k") -> Dict[str, pd.DataFrame]:
+    def preprocess_all(self, dataset_size: str = "100k") -> Dict[str, Any]:
         """Full preprocessing pipeline."""
         # Load data
         ratings, movies = self.load_movielens_data(dataset_size)
-        ratings = self.clean_ratings_data(ratings)
+
+        min_user_interactions, min_item_interactions = self.determine_thresholds(dataset_size)
+        ratings = self.clean_ratings_data(
+            ratings,
+            min_user_interactions=min_user_interactions,
+            min_item_interactions=min_item_interactions,
+        )
+
+        if ratings.empty:
+            raise ValueError(
+                "No ratings remain after sparsity reduction. Consider lowering the minimum interaction thresholds."
+            )
         
         # Get unique IDs from ratings BEFORE any encoding
         unique_user_ids = ratings['user_id'].unique()
@@ -212,7 +308,11 @@ class DataPreprocessor:
         
         # Transform movies (now safe because we filtered first)
         movies['item_id'] = self.item_encoder.transform(movies['item_id'])
-        
+
+        # Compute sparsity metrics prior to splitting
+        density = self.calculate_density(ratings)
+        sparsity = 1.0 - density
+
         # Split data
         train_ratings, test_ratings = self.split_data(ratings)
         
@@ -222,12 +322,30 @@ class DataPreprocessor:
         # Prepare content features
         movies = self.prepare_content_features(movies, dataset_size)
         
+        metadata = {
+            "dataset_size": dataset_size,
+            "num_ratings": int(len(ratings)),
+            "num_users": int(ratings['user_id'].nunique()),
+            "num_items": int(ratings['item_id'].nunique()),
+            "density": float(density),
+            "sparsity": float(sparsity),
+            "min_user_interactions": int(min_user_interactions),
+            "min_item_interactions": int(min_item_interactions),
+        }
+
+        logger.info(
+            "Post-cleaning density: %.4f (sparsity: %.4f)",
+            density,
+            sparsity,
+        )
+
         return {
             "train_ratings": train_ratings,
             "test_ratings": test_ratings,
             "user_item_matrix": user_item_matrix,
             "movies": movies,
-            "all_ratings": ratings
+            "all_ratings": ratings,
+            "metadata": metadata,
         }
 
 @st.cache_data(show_spinner=False)
